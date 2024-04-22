@@ -12,4 +12,7 @@ public interface AccountService {
 
     List<AccountDTO> getAllAccounts();
 
+    AccountDTO deposit(Long id, double amount);
+
+    AccountDTO withdraw(Long id, double amount);
 }

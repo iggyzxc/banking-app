@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/accounts")
@@ -18,23 +19,41 @@ public class AccountController {
         this.accountService = accountService;
     }
 
-    // Add account REST API
+    // Add account
     @PostMapping("/")
     public ResponseEntity<AccountDTO> createAccount(@RequestBody AccountDTO accountDTO) {
         return new ResponseEntity<>(accountService.createAccount(accountDTO), HttpStatus.CREATED);
     }
 
-    // Get an account REST API
+    // Get an account
     @GetMapping("/{id}")
     public ResponseEntity<AccountDTO> getAccountById(@PathVariable Long id) {
         AccountDTO accountId = accountService.getAccountById(id);
         return ResponseEntity.ok(accountId);
     }
 
+    // Get all account
     @GetMapping("/")
     public ResponseEntity<List<AccountDTO>> getAllAccounts() {
         List<AccountDTO> accountList = accountService.getAllAccounts();
         return ResponseEntity.ok(accountList);
     }
 
+    // Deposit an amount
+    @PutMapping("/{id}/deposit")
+    public ResponseEntity<AccountDTO> deposit(@PathVariable Long id,
+                                              @RequestBody Map<String, Double> request) {
+        Double amount = request.get("amount");
+        AccountDTO accountDeposit = accountService.deposit(id, amount);
+        return ResponseEntity.ok(accountDeposit);
+    }
+
+    // Withdraw an amount
+    @PutMapping("/{id}/withdraw")
+    public ResponseEntity<AccountDTO> withdraw(@PathVariable Long id,
+                                              @RequestBody Map<String, Double> request) {
+        Double amount = request.get("amount");
+        AccountDTO accountWithdraw = accountService.withdraw(id, amount);
+        return ResponseEntity.ok(accountWithdraw);
+    }
 }

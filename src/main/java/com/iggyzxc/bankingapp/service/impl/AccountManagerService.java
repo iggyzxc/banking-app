@@ -28,17 +28,45 @@ public class AccountManagerService implements AccountService {
 
     @Override
     public AccountDTO getAccountById(Long id) {
-        Account account = accountRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Account not found"));
+        Account account = accountRepository
+                .findById(id)
+                .orElseThrow(() -> new RuntimeException("Account not found."));
         return AccountMapper.mapToAccountDTO(account);
     }
 
     @Override
     public List<AccountDTO> getAllAccounts() {
         List<Account> accounts = accountRepository.findAll();
-        return accounts.stream()
+        return accounts
+                .stream()
                 .map(AccountMapper::mapToAccountDTO)
                 .collect(Collectors.toList());
     }
+
+    @Override
+    public AccountDTO deposit(Long id, double amount) {
+        Account account = accountRepository
+                .findById(id)
+                .orElseThrow(() -> new RuntimeException("Account not found."));
+        double totalBalance = account.getBalance() + amount;
+        account.setBalance(totalBalance);
+        Account savedAccount = accountRepository.save(account);
+        return AccountMapper.mapToAccountDTO(savedAccount);
+    }
+
+    @Override
+    public AccountDTO withdraw(Long id, double amount) {
+        Account account = accountRepository
+                .findById(id)
+                .orElseThrow(() -> new RuntimeException("Account not found."));
+        if(account.getBalance() < amount) {
+            throw new RuntimeException("Insufficient balance.");
+        }
+        double totalBalance = account.getBalance() - amount;
+        account.setBalance(totalBalance);
+        Account savedAccount = accountRepository.save(account);
+        return AccountMapper.mapToAccountDTO(savedAccount);
+    }
+
 
 }
