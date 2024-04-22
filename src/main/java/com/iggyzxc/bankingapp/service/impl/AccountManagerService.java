@@ -68,5 +68,11 @@ public class AccountManagerService implements AccountService {
         return AccountMapper.mapToAccountDTO(savedAccount);
     }
 
-
+    @Override
+    public void deleteAccount(Long id) {
+        Account account = accountRepository
+                .findById(id)
+                .orElseThrow(() -> new RuntimeException("Account not found."));
+        accountRepository.delete(account);
+    }
 }
