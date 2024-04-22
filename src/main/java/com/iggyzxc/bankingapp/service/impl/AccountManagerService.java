@@ -1,6 +1,7 @@
 package com.iggyzxc.bankingapp.service.impl;
 
 import com.iggyzxc.bankingapp.dto.AccountDTO;
+import com.iggyzxc.bankingapp.dto.TransferFundDTO;
 import com.iggyzxc.bankingapp.dto.mapper.AccountMapper;
 import com.iggyzxc.bankingapp.entity.Account;
 import com.iggyzxc.bankingapp.exception.AccountException;
@@ -76,5 +77,30 @@ public class AccountManagerService implements AccountService {
                 .findById(id)
                 .orElseThrow(() -> new AccountException("Account does not exist."));
         accountRepository.delete(account);
+    }
+
+    @Override
+    public void transferFund(TransferFundDTO transferFundDTO) {
+
+        // Account validation for source account
+        Account sourceAccount = accountRepository
+                .findById(transferFundDTO.sourceAccountId())
+                .orElseThrow(() -> new AccountException("Account does not exist."));
+
+        // Account validation for destination account
+        Account destinationAccount = accountRepository
+                .findById(transferFundDTO.destinationAccountId())
+                .orElseThrow(() -> new AccountException("Account does not exist."));
+
+        // Debit/Subtract the amount from sourceAccount object
+        sourceAccount.setBalance(
+                sourceAccount.getBalance() - transferFundDTO.amount());
+
+        // Credit/Add the amount to destinationAccount object
+        destinationAccount.setBalance(
+                destinationAccount.getBalance() + transferFundDTO.amount());
+
+        accountRepository.save(sourceAccount);
+        accountRepository.save(destinationAccount);
     }
 }

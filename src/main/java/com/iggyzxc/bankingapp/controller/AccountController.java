@@ -1,6 +1,7 @@
 package com.iggyzxc.bankingapp.controller;
 
 import com.iggyzxc.bankingapp.dto.AccountDTO;
+import com.iggyzxc.bankingapp.dto.TransferFundDTO;
 import com.iggyzxc.bankingapp.service.AccountService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -62,5 +63,12 @@ public class AccountController {
     public ResponseEntity<String> deleteAccount(@PathVariable Long id) {
         accountService.deleteAccount(id);
         return ResponseEntity.ok("Account is successfully deleted.");
+    }
+
+    // Transfer fund
+    @PostMapping("/transfer")
+    public ResponseEntity<String> transferFund(@RequestBody TransferFundDTO transferFundDTO) {
+        accountService.transferFund(transferFundDTO);
+        return ResponseEntity.ok("Successfully transferred funds.");
     }
 }
