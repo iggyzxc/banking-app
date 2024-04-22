@@ -3,10 +3,12 @@ package com.iggyzxc.bankingapp.service.impl;
 import com.iggyzxc.bankingapp.dto.AccountDTO;
 import com.iggyzxc.bankingapp.dto.mapper.AccountMapper;
 import com.iggyzxc.bankingapp.entity.Account;
+import com.iggyzxc.bankingapp.exception.AccountException;
 import com.iggyzxc.bankingapp.repository.AccountRepository;
 import com.iggyzxc.bankingapp.service.AccountService;
 import org.springframework.stereotype.Service;
 
+import java.nio.channels.AcceptPendingException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -30,7 +32,7 @@ public class AccountManagerService implements AccountService {
     public AccountDTO getAccountById(Long id) {
         Account account = accountRepository
                 .findById(id)
-                .orElseThrow(() -> new RuntimeException("Account not found."));
+                .orElseThrow(() -> new AccountException("Account does not exist."));
         return AccountMapper.mapToAccountDTO(account);
     }
 
@@ -47,7 +49,7 @@ public class AccountManagerService implements AccountService {
     public AccountDTO deposit(Long id, double amount) {
         Account account = accountRepository
                 .findById(id)
-                .orElseThrow(() -> new RuntimeException("Account not found."));
+                .orElseThrow(() -> new AccountException("Account does not exist."));
         double totalBalance = account.getBalance() + amount;
         account.setBalance(totalBalance);
         Account savedAccount = accountRepository.save(account);
@@ -58,7 +60,7 @@ public class AccountManagerService implements AccountService {
     public AccountDTO withdraw(Long id, double amount) {
         Account account = accountRepository
                 .findById(id)
-                .orElseThrow(() -> new RuntimeException("Account not found."));
+                .orElseThrow(() -> new AccountException("Account does not exist."));
         if(account.getBalance() < amount) {
             throw new RuntimeException("Insufficient balance.");
         }
@@ -72,7 +74,7 @@ public class AccountManagerService implements AccountService {
     public void deleteAccount(Long id) {
         Account account = accountRepository
                 .findById(id)
-                .orElseThrow(() -> new RuntimeException("Account not found."));
+                .orElseThrow(() -> new AccountException("Account does not exist."));
         accountRepository.delete(account);
     }
 }
