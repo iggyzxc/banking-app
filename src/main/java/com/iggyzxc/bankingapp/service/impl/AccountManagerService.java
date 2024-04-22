@@ -7,6 +7,9 @@ import com.iggyzxc.bankingapp.repository.AccountRepository;
 import com.iggyzxc.bankingapp.service.AccountService;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 public class AccountManagerService implements AccountService {
 
@@ -22,4 +25,20 @@ public class AccountManagerService implements AccountService {
         Account savedAccount = accountRepository.save(account);
         return AccountMapper.mapToAccountDTO(savedAccount);
     }
+
+    @Override
+    public AccountDTO getAccountById(Long id) {
+        Account account = accountRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Account not found"));
+        return AccountMapper.mapToAccountDTO(account);
+    }
+
+    @Override
+    public List<AccountDTO> getAllAccounts() {
+        List<Account> accounts = accountRepository.findAll();
+        return accounts.stream()
+                .map(AccountMapper::mapToAccountDTO)
+                .collect(Collectors.toList());
+    }
+
 }
