@@ -4,12 +4,13 @@ import com.iggyzxc.bankingapp.dto.AccountDTO;
 import com.iggyzxc.bankingapp.dto.TransferFundDTO;
 import com.iggyzxc.bankingapp.dto.mapper.AccountMapper;
 import com.iggyzxc.bankingapp.entity.Account;
+import com.iggyzxc.bankingapp.entity.Transaction;
 import com.iggyzxc.bankingapp.exception.AccountException;
 import com.iggyzxc.bankingapp.repository.AccountRepository;
+import com.iggyzxc.bankingapp.repository.TransactionRepository;
 import com.iggyzxc.bankingapp.service.AccountService;
 import org.springframework.stereotype.Service;
 
-import java.nio.channels.AcceptPendingException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -17,9 +18,16 @@ import java.util.stream.Collectors;
 public class AccountManagerService implements AccountService {
 
     private AccountRepository accountRepository;
+    private TransactionRepository transactionRepository;
 
-    public AccountManagerService(AccountRepository accountRepository) {
+    public static final String TRANSACTION_TYPE_DEPOSIT = "DEPOSIT";
+    public static final String TRANSACTION_TYPE_WITHDRAW = "WITHDRAW";
+    public static final String TRANSACTION_TYPE_TRANSFER = "TRANSFER";
+
+    public AccountManagerService(AccountRepository accountRepository,
+                                 TransactionRepository transactionRepository) {
         this.accountRepository = accountRepository;
+        this.transactionRepository = transactionRepository;
     }
 
     @Override
@@ -48,31 +56,49 @@ public class AccountManagerService implements AccountService {
 
     @Override
     public AccountDTO deposit(Long id, double amount) {
+
         Account account = accountRepository
                 .findById(id)
                 .orElseThrow(() -> new AccountException("Account does not exist."));
-        double totalBalance = account.getBalance() + amount;
-        account.setBalance(totalBalance);
+
+        account.setBalance(account.getBalance() + amount);
         Account savedAccount = accountRepository.save(account);
+
+        Transaction transaction = new Transaction();
+        transaction.setAccountId(id);
+        transaction.setAmount(amount);
+        transaction.setTransactionType(TRANSACTION_TYPE_DEPOSIT);
+        transactionRepository.save(transaction);
+
         return AccountMapper.mapToAccountDTO(savedAccount);
     }
 
     @Override
     public AccountDTO withdraw(Long id, double amount) {
+
         Account account = accountRepository
                 .findById(id)
                 .orElseThrow(() -> new AccountException("Account does not exist."));
+
         if(account.getBalance() < amount) {
             throw new RuntimeException("Insufficient balance.");
         }
-        double totalBalance = account.getBalance() - amount;
-        account.setBalance(totalBalance);
+
+        account.setBalance(account.getBalance() - amount);
         Account savedAccount = accountRepository.save(account);
+
+        Transaction transaction = new Transaction();
+        transaction.setAccountId(id);
+        transaction.setAmount(amount);
+        transaction.setTransactionType(TRANSACTION_TYPE_WITHDRAW);
+        transactionRepository.save(transaction);
+
         return AccountMapper.mapToAccountDTO(savedAccount);
     }
 
     @Override
     public void deleteAccount(Long id) {
+
         Account account = accountRepository
                 .findById(id)
                 .orElseThrow(() -> new AccountException("Account does not exist."));
@@ -92,6 +118,11 @@ public class AccountManagerService implements AccountService {
                 .findById(transferFundDTO.destinationAccountId())
                 .orElseThrow(() -> new AccountException("Account does not exist."));
 
+        // Transfer amount validation
+        if (sourceAccount.getBalance() < transferFundDTO.amount()) {
+            throw new RuntimeException("Insufficient balance.");
+        }
+
         // Debit/Subtract the amount from sourceAccount object
         sourceAccount.setBalance(
                 sourceAccount.getBalance() - transferFundDTO.amount());
@@ -102,5 +133,11 @@ public class AccountManagerService implements AccountService {
 
         accountRepository.save(sourceAccount);
         accountRepository.save(destinationAccount);
+
+        Transaction transaction = new Transaction();
+        transaction.setAccountId(transferFundDTO.sourceAccountId());
+        transaction.setAmount(transferFundDTO.amount());
+        transaction.setTransactionType(TRANSACTION_TYPE_TRANSFER);
+        transactionRepository.save(transaction);
     }
 }
