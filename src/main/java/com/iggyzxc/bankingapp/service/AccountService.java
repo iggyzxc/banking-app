@@ -2,6 +2,7 @@ package com.iggyzxc.bankingapp.service;
 
 
 import com.iggyzxc.bankingapp.dto.AccountDTO;
+import com.iggyzxc.bankingapp.dto.TransactionDTO;
 import com.iggyzxc.bankingapp.dto.TransferFundDTO;
 
 import java.util.List;
@@ -21,4 +22,5 @@ public interface AccountService {
 
     void transferFund(TransferFundDTO transferFundDTO);
 
+    List<TransactionDTO> getTransactionHistory(Long id);
 }

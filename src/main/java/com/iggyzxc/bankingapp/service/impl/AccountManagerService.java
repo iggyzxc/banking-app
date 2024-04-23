@@ -1,6 +1,7 @@
 package com.iggyzxc.bankingapp.service.impl;
 
 import com.iggyzxc.bankingapp.dto.AccountDTO;
+import com.iggyzxc.bankingapp.dto.TransactionDTO;
 import com.iggyzxc.bankingapp.dto.TransferFundDTO;
 import com.iggyzxc.bankingapp.dto.mapper.AccountMapper;
 import com.iggyzxc.bankingapp.entity.Account;
@@ -11,6 +12,7 @@ import com.iggyzxc.bankingapp.repository.TransactionRepository;
 import com.iggyzxc.bankingapp.service.AccountService;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -68,6 +70,7 @@ public class AccountManagerService implements AccountService {
         transaction.setAccountId(id);
         transaction.setAmount(amount);
         transaction.setTransactionType(TRANSACTION_TYPE_DEPOSIT);
+        transaction.setTimestamp(LocalDateTime.now());
         transactionRepository.save(transaction);
 
         return AccountMapper.mapToAccountDTO(savedAccount);
@@ -91,6 +94,7 @@ public class AccountManagerService implements AccountService {
         transaction.setAccountId(id);
         transaction.setAmount(amount);
         transaction.setTransactionType(TRANSACTION_TYPE_WITHDRAW);
+        transaction.setTimestamp(LocalDateTime.now());
         transactionRepository.save(transaction);
 
         return AccountMapper.mapToAccountDTO(savedAccount);
@@ -138,6 +142,26 @@ public class AccountManagerService implements AccountService {
         transaction.setAccountId(transferFundDTO.sourceAccountId());
         transaction.setAmount(transferFundDTO.amount());
         transaction.setTransactionType(TRANSACTION_TYPE_TRANSFER);
+        transaction.setTimestamp(LocalDateTime.now());
         transactionRepository.save(transaction);
+    }
+
+    @Override
+    public List<TransactionDTO> getTransactionHistory(Long id) {
+        List<Transaction> transactions = transactionRepository.findByAccountIdOrderByTimestampDesc(id);
+        return transactions.stream()
+                .map(this::mapToTransactionDTO)
+                .collect(Collectors.toList());
+    }
+
+    private TransactionDTO mapToTransactionDTO(Transaction transaction) {
+        TransactionDTO transactionDTO = new TransactionDTO(
+                transaction.getId(),
+                transaction.getAccountId(),
+                transaction.getAmount(),
+                transaction.getTransactionType(),
+                transaction.getTimestamp()
+        );
+        return transactionDTO;
     }
 }

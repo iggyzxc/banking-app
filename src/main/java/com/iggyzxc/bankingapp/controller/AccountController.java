@@ -1,6 +1,7 @@
 package com.iggyzxc.bankingapp.controller;
 
 import com.iggyzxc.bankingapp.dto.AccountDTO;
+import com.iggyzxc.bankingapp.dto.TransactionDTO;
 import com.iggyzxc.bankingapp.dto.TransferFundDTO;
 import com.iggyzxc.bankingapp.service.AccountService;
 import org.springframework.http.HttpStatus;
@@ -70,5 +71,12 @@ public class AccountController {
     public ResponseEntity<String> transferFund(@RequestBody TransferFundDTO transferFundDTO) {
         accountService.transferFund(transferFundDTO);
         return ResponseEntity.ok("Successfully transferred funds.");
+    }
+
+    // Get transaction history
+    @GetMapping("/{id}/transactions")
+    public ResponseEntity<List<TransactionDTO>> getAllTransactions(@PathVariable Long id) {
+        List<TransactionDTO> transactions = accountService.getTransactionHistory(id);
+        return ResponseEntity.ok(transactions);
     }
 }
