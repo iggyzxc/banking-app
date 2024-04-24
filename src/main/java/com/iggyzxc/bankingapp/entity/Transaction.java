@@ -15,11 +15,21 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "transactions")
 public class Transaction {
+
+    public enum TransactionType {
+        DEPOSIT,
+        WITHDRAW,
+        TRANSFER
+    };
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private Long accountId;
     private double amount;
-    private String transactionType; // Deposit, Withdraw, or Transfer
+
+    @Enumerated(EnumType.STRING)
+    private TransactionType transactionType; // Deposit, Withdraw, or Transfer
+
     private LocalDateTime timestamp;
 }

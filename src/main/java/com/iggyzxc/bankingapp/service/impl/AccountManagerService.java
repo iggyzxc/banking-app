@@ -22,9 +22,9 @@ public class AccountManagerService implements AccountService {
     private AccountRepository accountRepository;
     private TransactionRepository transactionRepository;
 
-    public static final String TRANSACTION_TYPE_DEPOSIT = "DEPOSIT";
-    public static final String TRANSACTION_TYPE_WITHDRAW = "WITHDRAW";
-    public static final String TRANSACTION_TYPE_TRANSFER = "TRANSFER";
+//    public static final String TRANSACTION_TYPE_DEPOSIT = "DEPOSIT";
+//    public static final String TRANSACTION_TYPE_WITHDRAW = "WITHDRAW";
+//    public static final String TRANSACTION_TYPE_TRANSFER = "TRANSFER";
 
     public AccountManagerService(AccountRepository accountRepository,
                                  TransactionRepository transactionRepository) {
@@ -69,7 +69,7 @@ public class AccountManagerService implements AccountService {
         Transaction transaction = new Transaction();
         transaction.setAccountId(id);
         transaction.setAmount(amount);
-        transaction.setTransactionType(TRANSACTION_TYPE_DEPOSIT);
+        transaction.setTransactionType(Transaction.TransactionType.DEPOSIT);
         transaction.setTimestamp(LocalDateTime.now());
         transactionRepository.save(transaction);
 
@@ -93,7 +93,7 @@ public class AccountManagerService implements AccountService {
         Transaction transaction = new Transaction();
         transaction.setAccountId(id);
         transaction.setAmount(amount);
-        transaction.setTransactionType(TRANSACTION_TYPE_WITHDRAW);
+        transaction.setTransactionType(Transaction.TransactionType.WITHDRAW);
         transaction.setTimestamp(LocalDateTime.now());
         transactionRepository.save(transaction);
 
@@ -141,7 +141,7 @@ public class AccountManagerService implements AccountService {
         Transaction transaction = new Transaction();
         transaction.setAccountId(transferFundDTO.sourceAccountId());
         transaction.setAmount(transferFundDTO.amount());
-        transaction.setTransactionType(TRANSACTION_TYPE_TRANSFER);
+        transaction.setTransactionType(Transaction.TransactionType.TRANSFER);
         transaction.setTimestamp(LocalDateTime.now());
         transactionRepository.save(transaction);
     }
