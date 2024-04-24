@@ -3,7 +3,6 @@ package com.iggyzxc.bankingapp.service.impl;
 import com.iggyzxc.bankingapp.dto.AccountDTO;
 import com.iggyzxc.bankingapp.dto.TransactionDTO;
 import com.iggyzxc.bankingapp.dto.TransferFundDTO;
-import com.iggyzxc.bankingapp.dto.mapper.AccountMapper;
 import com.iggyzxc.bankingapp.entity.Account;
 import com.iggyzxc.bankingapp.entity.Transaction;
 import com.iggyzxc.bankingapp.exception.AccountException;
@@ -34,9 +33,9 @@ public class AccountManagerService implements AccountService {
 
     @Override
     public AccountDTO createAccount(AccountDTO accountDTO) {
-        Account account = AccountMapper.mapToAccount(accountDTO);
+        Account account = AccountDTO.toEntity(accountDTO);
         Account savedAccount = accountRepository.save(account);
-        return AccountMapper.mapToAccountDTO(savedAccount);
+        return AccountDTO.fromEntity(savedAccount);
     }
 
     @Override
@@ -44,7 +43,7 @@ public class AccountManagerService implements AccountService {
         Account account = accountRepository
                 .findById(id)
                 .orElseThrow(() -> new AccountException("Account does not exist."));
-        return AccountMapper.mapToAccountDTO(account);
+        return AccountDTO.fromEntity(account);
     }
 
     @Override
@@ -52,7 +51,7 @@ public class AccountManagerService implements AccountService {
         List<Account> accounts = accountRepository.findAll();
         return accounts
                 .stream()
-                .map(AccountMapper::mapToAccountDTO)
+                .map(AccountDTO::fromEntity)
                 .collect(Collectors.toList());
     }
 
@@ -73,7 +72,7 @@ public class AccountManagerService implements AccountService {
         transaction.setTimestamp(LocalDateTime.now());
         transactionRepository.save(transaction);
 
-        return AccountMapper.mapToAccountDTO(savedAccount);
+        return AccountDTO.fromEntity(savedAccount);
     }
 
     @Override
@@ -97,7 +96,7 @@ public class AccountManagerService implements AccountService {
         transaction.setTimestamp(LocalDateTime.now());
         transactionRepository.save(transaction);
 
-        return AccountMapper.mapToAccountDTO(savedAccount);
+        return AccountDTO.fromEntity(savedAccount);
     }
 
     @Override
@@ -150,18 +149,8 @@ public class AccountManagerService implements AccountService {
     public List<TransactionDTO> getTransactionHistory(Long id) {
         List<Transaction> transactions = transactionRepository.findByAccountIdOrderByTimestampDesc(id);
         return transactions.stream()
-                .map(this::mapToTransactionDTO)
+                .map(TransactionDTO::fromEntity)
                 .collect(Collectors.toList());
     }
 
-    private TransactionDTO mapToTransactionDTO(Transaction transaction) {
-        TransactionDTO transactionDTO = new TransactionDTO(
-                transaction.getId(),
-                transaction.getAccountId(),
-                transaction.getAmount(),
-                transaction.getTransactionType(),
-                transaction.getTimestamp()
-        );
-        return transactionDTO;
-    }
 }

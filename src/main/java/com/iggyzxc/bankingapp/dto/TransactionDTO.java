@@ -9,4 +9,15 @@ public record TransactionDTO(Long id,
                              double amount,
                              Transaction.TransactionType transactionType,
                              LocalDateTime timestamp) {
+
+    public static TransactionDTO fromEntity(Transaction transaction) {
+        TransactionDTO transactionDTO = new TransactionDTO(
+                transaction.getId(),
+                transaction.getAccountId(),
+                transaction.getAmount(),
+                transaction.getTransactionType(),
+                transaction.getTimestamp()
+        );
+        return transactionDTO;
+    }
 }
