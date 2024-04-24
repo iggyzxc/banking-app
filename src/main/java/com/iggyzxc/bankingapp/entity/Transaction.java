@@ -32,4 +32,12 @@ public class Transaction {
     private TransactionType transactionType; // Deposit, Withdraw, or Transfer
 
     private LocalDateTime timestamp;
+
+    public static void createTransaction(Long id, double amount) {
+        Transaction transaction = new Transaction();
+        transaction.setAccountId(id);
+        transaction.setAmount(amount);
+        transaction.setTimestamp(LocalDateTime.now());
+    }
 }
+

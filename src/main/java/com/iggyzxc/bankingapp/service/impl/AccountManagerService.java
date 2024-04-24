@@ -21,16 +21,15 @@ public class AccountManagerService implements AccountService {
     private AccountRepository accountRepository;
     private TransactionRepository transactionRepository;
 
-//    public static final String TRANSACTION_TYPE_DEPOSIT = "DEPOSIT";
-//    public static final String TRANSACTION_TYPE_WITHDRAW = "WITHDRAW";
-//    public static final String TRANSACTION_TYPE_TRANSFER = "TRANSFER";
-
     public AccountManagerService(AccountRepository accountRepository,
                                  TransactionRepository transactionRepository) {
         this.accountRepository = accountRepository;
         this.transactionRepository = transactionRepository;
     }
 
+
+
+    // CREATE
     @Override
     public AccountDTO createAccount(AccountDTO accountDTO) {
         Account account = AccountDTO.toEntity(accountDTO);
@@ -38,6 +37,7 @@ public class AccountManagerService implements AccountService {
         return AccountDTO.fromEntity(savedAccount);
     }
 
+    // VIEW an account
     @Override
     public AccountDTO getAccountById(Long id) {
         Account account = accountRepository
@@ -46,6 +46,7 @@ public class AccountManagerService implements AccountService {
         return AccountDTO.fromEntity(account);
     }
 
+    // VIEW all accounts
     @Override
     public List<AccountDTO> getAllAccounts() {
         List<Account> accounts = accountRepository.findAll();
@@ -55,6 +56,7 @@ public class AccountManagerService implements AccountService {
                 .collect(Collectors.toList());
     }
 
+    // DEPOSIT amount
     @Override
     public AccountDTO deposit(Long id, double amount) {
 
@@ -66,15 +68,14 @@ public class AccountManagerService implements AccountService {
         Account savedAccount = accountRepository.save(account);
 
         Transaction transaction = new Transaction();
-        transaction.setAccountId(id);
-        transaction.setAmount(amount);
         transaction.setTransactionType(Transaction.TransactionType.DEPOSIT);
-        transaction.setTimestamp(LocalDateTime.now());
+        Transaction.createTransaction(id, amount);
         transactionRepository.save(transaction);
 
         return AccountDTO.fromEntity(savedAccount);
     }
 
+    // WITHDRAW amount
     @Override
     public AccountDTO withdraw(Long id, double amount) {
 
@@ -90,15 +91,14 @@ public class AccountManagerService implements AccountService {
         Account savedAccount = accountRepository.save(account);
 
         Transaction transaction = new Transaction();
-        transaction.setAccountId(id);
-        transaction.setAmount(amount);
         transaction.setTransactionType(Transaction.TransactionType.WITHDRAW);
-        transaction.setTimestamp(LocalDateTime.now());
+        Transaction.createTransaction(id, amount);
         transactionRepository.save(transaction);
 
         return AccountDTO.fromEntity(savedAccount);
     }
 
+    // DELETE account
     @Override
     public void deleteAccount(Long id) {
 
@@ -108,6 +108,7 @@ public class AccountManagerService implements AccountService {
         accountRepository.delete(account);
     }
 
+    // TRANSFER amount
     @Override
     public void transferFund(TransferFundDTO transferFundDTO) {
 
@@ -145,6 +146,7 @@ public class AccountManagerService implements AccountService {
         transactionRepository.save(transaction);
     }
 
+    // VIEW all transactions
     @Override
     public List<TransactionDTO> getTransactionHistory(Long id) {
         List<Transaction> transactions = transactionRepository.findByAccountIdOrderByTimestampDesc(id);

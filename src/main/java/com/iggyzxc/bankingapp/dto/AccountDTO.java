@@ -6,6 +6,7 @@ public record AccountDTO(Long id,
                          String accountHolderName,
                          double balance) {
     public static Account toEntity(AccountDTO accountDTO) {
+
         Account account = new Account(
                 accountDTO.id(),
                 accountDTO.accountHolderName(),
