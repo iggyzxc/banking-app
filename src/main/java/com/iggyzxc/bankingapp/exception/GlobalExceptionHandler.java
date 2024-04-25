@@ -11,10 +11,11 @@ import java.time.LocalDateTime;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
-    // Handle specific exception - AccountException
-    @ExceptionHandler(AccountException.class)
-    public ResponseEntity<ErrorDetails> handleAccountException(AccountException exception,
-                                                               WebRequest webRequest) {
+    // Handles id not found exception
+    @ExceptionHandler(AccountException.IdNotFoundException.class)
+    public ResponseEntity<ErrorDetails> handleIdNotFoundException(
+            AccountException.IdNotFoundException exception,
+            WebRequest webRequest) {
         ErrorDetails errorDetails = new ErrorDetails(
                 LocalDateTime.now(),
                 exception.getMessage(),
@@ -24,7 +25,21 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errorDetails, HttpStatus.NOT_FOUND);
     }
 
-    // Handle generic exception
+    // Handles insufficient balance exception
+    @ExceptionHandler(AccountException.InsufficientBalanceException.class)
+    public ResponseEntity<ErrorDetails> handleInsufficientBalanceException(
+            AccountException.InsufficientBalanceException exception,
+            WebRequest webRequest) {
+        ErrorDetails errorDetails = new ErrorDetails(
+                LocalDateTime.now(),
+                exception.getMessage(),
+                webRequest.getDescription(false),
+                "INSUFFICIENT_BALANCE"
+        );
+        return new ResponseEntity<>(errorDetails, HttpStatus.BAD_REQUEST);
+    }
+
+    // Handles generic exception
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorDetails> handleGenericException(Exception exception,
                                                                 WebRequest webRequest) {

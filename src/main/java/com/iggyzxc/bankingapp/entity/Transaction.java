@@ -1,6 +1,7 @@
 package com.iggyzxc.bankingapp.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.DecimalMin;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -26,6 +27,7 @@ public class Transaction {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private Long accountId;
+
     private double amount;
 
     @Enumerated(EnumType.STRING)

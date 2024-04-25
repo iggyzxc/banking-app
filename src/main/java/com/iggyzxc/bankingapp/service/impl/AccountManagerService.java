@@ -27,8 +27,6 @@ public class AccountManagerService implements AccountService {
         this.transactionRepository = transactionRepository;
     }
 
-
-
     // CREATE
     @Override
     public AccountDTO createAccount(AccountDTO accountDTO) {
@@ -42,7 +40,11 @@ public class AccountManagerService implements AccountService {
     public AccountDTO getAccountById(Long id) {
         Account account = accountRepository
                 .findById(id)
-                .orElseThrow(() -> new AccountException("Account does not exist."));
+                .orElseThrow(
+                        () -> new AccountException.IdNotFoundException(
+                                String.format(
+                                        "Account with ID %s does not exist.", id)
+                        ));
         return AccountDTO.fromEntity(account);
     }
 
@@ -62,7 +64,11 @@ public class AccountManagerService implements AccountService {
 
         Account account = accountRepository
                 .findById(id)
-                .orElseThrow(() -> new AccountException("Account does not exist."));
+                .orElseThrow(
+                        () -> new AccountException.IdNotFoundException(
+                                String.format(
+                                        "Account with ID %s does not exist.", id)
+                        ));
 
         account.setBalance(account.getBalance() + amount);
         Account savedAccount = accountRepository.save(account);
@@ -81,13 +87,20 @@ public class AccountManagerService implements AccountService {
 
         Account account = accountRepository
                 .findById(id)
-                .orElseThrow(() -> new AccountException("Account does not exist."));
+                .orElseThrow(
+                        () -> new AccountException.IdNotFoundException(
+                                        String.format(
+                                                "Account with ID %s does not exist.", id)
+                        ));
 
-        if(account.getBalance() < amount) {
-            throw new RuntimeException("Insufficient balance.");
+        if(account.getBalance() >= amount && amount > 0 ) {
+            account.setBalance(account.getBalance() - amount);
+        } else {
+            throw new AccountException
+                    .InsufficientBalanceException(
+                    "Insufficient balance to withdraw " + amount);
         }
 
-        account.setBalance(account.getBalance() - amount);
         Account savedAccount = accountRepository.save(account);
 
         Transaction transaction = new Transaction();
@@ -115,12 +128,20 @@ public class AccountManagerService implements AccountService {
         // Account validation for source account
         Account sourceAccount = accountRepository
                 .findById(transferFundDTO.sourceAccountId())
-                .orElseThrow(() -> new AccountException("Account does not exist."));
+                .orElseThrow(
+                        () -> new AccountException.IdNotFoundException(
+                                String.format(
+                                        "Account with source ID %s does not exist.", transferFundDTO.sourceAccountId())
+                        ));
 
         // Account validation for destination account
         Account destinationAccount = accountRepository
                 .findById(transferFundDTO.destinationAccountId())
-                .orElseThrow(() -> new AccountException("Account does not exist."));
+                .orElseThrow(
+                        () -> new AccountException.IdNotFoundException(
+                                String.format(
+                                        "Account with destination ID %s does not exist.", transferFundDTO.destinationAccountId())
+                        ));
 
         // Transfer amount validation
         if (sourceAccount.getBalance() < transferFundDTO.amount()) {

@@ -1,6 +1,7 @@
 package com.iggyzxc.bankingapp.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.DecimalMin;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,5 +19,7 @@ public class Account {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String accountHolderName;
+
+    @DecimalMin(value = "0.0", inclusive = true)
     private double balance;
 }
